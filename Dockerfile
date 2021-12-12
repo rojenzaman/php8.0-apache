@@ -1,4 +1,4 @@
-# NOTE: THIS DOCKERFILE IS APPLIED FROM: https://raw.githubusercontent.com/docker-library/wordpress/d6cedc3a993142ed4597579ad4084b9a81cd3e59/latest/php8.0/apache/Dockerfile
+# NOTE: THIS DOCKERFILE IS APPLIED FROM: https://raw.githubusercontent.com/docker-library/wordpress/master/latest/php8.0/apache/Dockerfile
 
 FROM php:8.0-apache
 
@@ -20,13 +20,16 @@ RUN set -ex; \
 	apt-get install -y --no-install-recommends \
 		libfreetype6-dev \
 		libjpeg-dev \
+		libmagickwand-dev \
 		libpng-dev \
+		libwebp-dev \
 		libzip-dev \
 	; \
 	\
 	docker-php-ext-configure gd \
 		--with-freetype \
 		--with-jpeg \
+		--with-webp \
 	; \
 	docker-php-ext-install -j "$(nproc)" \
 		bcmath \
@@ -35,6 +38,10 @@ RUN set -ex; \
 		mysqli \
 		zip \
 	; \
+# https://pecl.php.net/package/imagick
+	pecl install imagick-3.5.0; \
+	docker-php-ext-enable imagick; \
+	rm -r /tmp/pear; \
 	\
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \
@@ -99,6 +106,7 @@ RUN set -eux; \
 VOLUME /var/www/html
 
 COPY docker-entrypoint.sh /usr/local/bin/
+COPY wordpress-cli-install.sh /usr/local/bin/
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]
