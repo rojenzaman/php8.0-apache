@@ -106,7 +106,6 @@ RUN set -eux; \
 VOLUME /var/www/html
 
 COPY docker-entrypoint.sh /usr/local/bin/
-COPY wordpress-cli-install.sh /usr/local/bin/
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["apache2-foreground"]
